@@ -1,17 +1,15 @@
-import { VueConstructor } from 'vue';
+import { App as Application, reactive } from 'vue';
 import { VueAbility } from './types';
 
 const WATCHERS = new WeakMap();
 
-function renderingDependencyFor(Vue: VueConstructor, ability: VueAbility) {
+function renderingDependencyFor(app: Application, ability: VueAbility) {
   if (WATCHERS.has(ability)) {
     return WATCHERS.get(ability);
   }
 
   const data = { _touch: true }; // eslint-disable-line no-underscore-dangle
-  const watcher = typeof Vue.observable === 'function'
-    ? Vue.observable(data)
-    : new Vue({ data });
+  const watcher = reactive(data);
 
   ability.on('updated', () => {
     // eslint-disable-next-line no-underscore-dangle
@@ -34,10 +32,10 @@ function abilityDescriptor(ability?: VueAbility) {
   };
 }
 
-export function abilitiesPlugin(Vue: VueConstructor, defaultAbility?: VueAbility) {
-  Object.defineProperty(Vue.prototype, '$ability', abilityDescriptor(defaultAbility));
+export function abilitiesPlugin(app: Application, defaultAbility?: VueAbility) {
+  Object.defineProperty(app.config.globalProperties, '$ability', abilityDescriptor(defaultAbility));
 
-  Vue.mixin({
+  app.mixin({
     beforeCreate() {
       const { ability, parent } = this.$options;
       const localAbility = ability || (parent ? parent.$ability : null);
@@ -49,7 +47,7 @@ export function abilitiesPlugin(Vue: VueConstructor, defaultAbility?: VueAbility
 
     methods: {
       $can(...args: any): boolean {
-        const dep = renderingDependencyFor(Vue, this.$ability);
+        const dep = renderingDependencyFor(app, this.$ability);
         dep._touch = dep._touch; // eslint-disable-line
         return this.$ability.can(...args);
       }
