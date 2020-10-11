@@ -1,6 +1,5 @@
-import Vue, { VNode } from 'vue';
+import { defineComponent, VNode } from 'vue';
 import { SubjectType, Generics, AnyAbility, Abilities, IfString, AbilityTuple } from '@casl/ability';
-import { VueAbility } from '../types';
 
 type AbilityCanProps<
   T extends Abilities,
@@ -17,7 +16,7 @@ export type AllCanProps<T extends AnyAbility> = AbilityCanProps<Generics<T>['abi
   passThrough?: boolean
 };
 
-export default Vue.extend<AllCanProps<VueAbility>>({
+export default defineComponent({
   name: 'Can',
   functional: true,
   props: {

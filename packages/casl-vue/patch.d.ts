@@ -1,15 +1,12 @@
-import Vue from 'vue';
 import { AnyAbility } from '@casl/ability';
 
-declare module 'vue/types/vue' {
-  interface Vue {
+declare module 'vue/runtime-core' {
+  export interface ComponentOptions {
+    ability?: AnyAbility;
+  }
+
+  export interface ComponentCustomProperties {
     $ability: AnyAbility
     $can(this: this, ...args: Parameters<this['$ability']['can']>): boolean
-  }
-}
-
-declare module 'vue/types/options' {
-  interface ComponentOptions<V extends Vue> {
-    ability?: AnyAbility;
   }
 }
