@@ -30,8 +30,8 @@ export default defineComponent({
     passThrough: Boolean,
     field: String
   },
-  render(h, { props, children, parent, data }): VNode | VNode[] {
-    const mixed = props as any;
+  render(): VNode | VNode[] {
+    const mixed = this.$props as any;
     const [action, field] = (mixed.I || mixed.do || '').split(' ');
     const subject = mixed.of || mixed.an || mixed.a || mixed.this || mixed.on;
 
@@ -39,20 +39,21 @@ export default defineComponent({
       throw new Error('[Vue Can]: neither `I` nor `do` prop was passed in <Can>');
     }
 
-    const isAllowed = parent.$can(action, subject, field);
-    const canRender = props.not ? !isAllowed : isAllowed;
+    const isAllowed = this.$parent.$can(action, subject, field); // TODO: Parent might be null
+    const canRender = this.not ? !isAllowed : isAllowed;
 
-    if (!props.passThrough) {
-      return canRender ? children : [];
+    if (!this.passThrough) {
+      return canRender ? children : []; // TODO: we no longer have access to children without refs...
     }
 
-    if (!data.scopedSlots || !data.scopedSlots.default) {
+    if (!this.$slots || !this.$slots.default) {
       throw new Error('[Vue Can]: `passThrough` expects default scoped slot to be specified');
     }
 
-    return data.scopedSlots.default({
+    // TODO: Type error
+    return this.$slots.default({
       allowed: canRender,
-      ability: parent.$ability,
+      ability: this.$parent.$ability,
     }) as VNode;
   }
 });
