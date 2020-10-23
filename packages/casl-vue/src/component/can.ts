@@ -39,21 +39,24 @@ export default defineComponent({
       throw new Error('[Vue Can]: neither `I` nor `do` prop was passed in <Can>');
     }
 
-    const isAllowed = this.$parent.$can(action, subject, field); // TODO: Parent might be null
-    const canRender = this.not ? !isAllowed : isAllowed;
-
-    if (!this.passThrough) {
-      return canRender ? children : []; // TODO: we no longer have access to children without refs...
+    if (!this.$parent) {
+      throw new Error('[Vue Can]: unable to locate parent instance');
     }
+
+    const isAllowed = this.$parent.$can(action, subject, field); // TODO: Property '$can' does not exist on type 'ComponentPublicInstance<{}, {}, {}, {}, {}, {}, {}, {}, false, ComponentOptionsBase<any, any, any, any, any, any, any, any, any, {}>>'
+    const canRender = this.not ? !isAllowed : isAllowed;
 
     if (!this.$slots || !this.$slots.default) {
       throw new Error('[Vue Can]: `passThrough` expects default scoped slot to be specified');
     }
 
-    // TODO: Type error
+    if (!this.passThrough) {
+      return canRender ? this.$slots.default().filter(child => child) : [];
+    }
+
     return this.$slots.default({
       allowed: canRender,
-      ability: this.$parent.$ability,
-    }) as VNode;
+      ability: this.$parent.$ability, // TODO: Property '$ability' does not exist on type 'ComponentPublicInstance<{}, {}, {}, {}, {}, {}, {}, {}, false, ComponentOptionsBase<any, any, any, any, any, any, any, any, any, {}>>'
+    }) as VNode[];
   }
 });
