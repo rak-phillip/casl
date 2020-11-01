@@ -43,6 +43,7 @@ export default defineComponent({
       throw new Error('[Vue Can]: unable to locate parent instance');
     }
 
+    // @ts-ignore
     const isAllowed = this.$parent.$can(action, subject, field); // TODO: Property '$can' does not exist on type 'ComponentPublicInstance<{}, {}, {}, {}, {}, {}, {}, {}, false, ComponentOptionsBase<any, any, any, any, any, any, any, any, any, {}>>'
     const canRender = this.not ? !isAllowed : isAllowed;
 
@@ -56,6 +57,7 @@ export default defineComponent({
 
     return this.$slots.default({
       allowed: canRender,
+      // @ts-ignore
       ability: this.$parent.$ability, // TODO: Property '$ability' does not exist on type 'ComponentPublicInstance<{}, {}, {}, {}, {}, {}, {}, {}, false, ComponentOptionsBase<any, any, any, any, any, any, any, any, any, {}>>'
     }) as VNode[];
   }
